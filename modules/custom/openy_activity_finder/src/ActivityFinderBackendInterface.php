@@ -2,7 +2,12 @@
 
 namespace Drupal\openy_activity_finder;
 
-interface OpenyActivityFinderBackendInterface {
+use Drupal\Component\Plugin\PluginInspectionInterface;
+
+/**
+ * Defines an interface for Activity Finder backend plugins.
+ */
+interface ActivityFinderBackendInterface extends PluginInspectionInterface {
 
   /**
    * Run Programs search.
@@ -19,10 +24,18 @@ interface OpenyActivityFinderBackendInterface {
    */
   public function getLocations();
 
-
   /**
    * Get list of all sort options.
    */
   public function getSortOptions();
 
+  /**
+   * Get more info for programs.
+   *
+   * @param $request
+   *   A request object.
+   *
+   * @return mixed
+   */
+  public function getProgramsMoreInfo($request);
 }

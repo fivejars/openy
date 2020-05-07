@@ -4,8 +4,10 @@ namespace Drupal\openy_activity_finder\Controller;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\TrustedRedirectResponse;
+use Drupal\openy_activity_finder\ActivityFinderBackendInterface;
 use Drupal\openy_activity_finder\Entity\ProgramSearchLog;
 use Drupal\openy_activity_finder\OpenyActivityFinderBackendInterface;
 use Drupal\openy_activity_finder\Entity\ProgramSearchCheckLog;
@@ -24,7 +26,7 @@ class ActivityFinderController extends ControllerBase {
   const CACHE_LIFETIME = 300;
 
   /**
-   * @var \Drupal\openy_activity_finder\OpenyActivityFinderBackendInterface
+   * @var \Drupal\openy_activity_finder\ActivityFinderBackendInterface
    */
   protected $backend;
 
@@ -40,21 +42,30 @@ class ActivityFinderController extends ControllerBase {
 
   /**
    * Creates a new ActivityFinderController.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory service.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   *   Cache backend.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
    */
-  public function __construct(OpenyActivityFinderBackendInterface $backend, CacheBackendInterface $cacheBackend, TimeInterface $time) {
-    $this->backend = $backend;
+  public function __construct(ConfigFactoryInterface $config_factory, CacheBackendInterface $cacheBackend, TimeInterface $time) {
     $this->cacheBackend = $cacheBackend;
     $this->time = $time;
+
+    $config = $config_factory->get('openy_activity_finder.settings')->get('backend');
+    $this->backend = $backend;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    $config = $container->get('config.factory')->get('openy_activity_finder.settings');
+//    $config = $container->get('config.factory')->get('openy_activity_finder.settings');
 
     return new static(
-      $container->get($config->get('backend')),
+      $container->get('config.factory'),
       $container->get('cache.default'),
       $container->get('datetime.time')
     );

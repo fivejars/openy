@@ -1,9 +1,10 @@
 <?php
 
-namespace Drupal\openy_activity_finder;
+namespace Drupal\openy_activity_finder\Plugin\ActivityFinderBackend;
 
 use DateTimeInterface;
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -11,6 +12,8 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\openy_activity_finder\ActivityFinderBackendPluginBase;
+use Drupal\openy_activity_finder\Annotation\ActivityFinderBackend;
 use Drupal\search_api\Entity\Index;
 use Drupal\Core\Url;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -18,9 +21,15 @@ use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\search_api\SearchApiException;
 
 /**
- * {@inheritdoc}
+ * Activity Finder Solr backend plugin.
+ *
+ * @ActivityFinderBackend(
+ *   id = "openy_activity_finder.solr_backend",
+ *   label = @Translation("Activity Finder Solr backend"),
+ *   description = @Translation("Store data in the Solr server")
+ * )
  */
-class OpenyActivityFinderSolrBackend extends OpenyActivityFinderBackend {
+class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
 
   // 1 day for cache.
   const CACHE_TTL = 86400;
@@ -28,8 +37,6 @@ class OpenyActivityFinderSolrBackend extends OpenyActivityFinderBackend {
   // Number of results to retrieve per page.
   const TOTAL_RESULTS_PER_PAGE = 25;
 
-  // Cache ID for locations info.
-  const ACTIVITY_FINDER_CACHE_TAG = 'openy_activity_finder:default';
 
   /**
    * Cache default.
@@ -88,8 +95,23 @@ class OpenyActivityFinderSolrBackend extends OpenyActivityFinderBackend {
   protected $moduleHandler;
 
   /**
-   * Creates a new RepeatController.
+   * Entity type manager service.
    *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * Constructs Activity Finder Solr Backend plugin.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
    * @param CacheBackendInterface $cache
    *   Cache default.
    * @param Connection $database
@@ -105,8 +127,8 @@ class OpenyActivityFinderSolrBackend extends OpenyActivityFinderBackend {
    * @param ModuleHandlerInterface $module_handler
    *   Module Handler.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, CacheBackendInterface $cache, Connection $database, QueryFactory $entity_query, EntityTypeManager $entity_type_manager, DateFormatterInterface $date_formatter, TimeInterface $time, LoggerChannelInterface $loggerChannel, ModuleHandlerInterface $module_handler) {
-    parent::__construct($config_factory);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, CacheBackendInterface $cache, Connection $database, QueryFactory $entity_query, EntityTypeManager $entity_type_manager, DateFormatterInterface $date_formatter, TimeInterface $time, LoggerChannelInterface $loggerChannel, ModuleHandlerInterface $module_handler) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $config_factory);
     $this->cache = $cache;
     $this->database = $database;
     $this->entityQuery = $entity_query;

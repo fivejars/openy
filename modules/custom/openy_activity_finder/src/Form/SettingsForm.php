@@ -9,6 +9,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\openy_activity_finder\ActivityFinderBackendPluginManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -47,6 +48,13 @@ class SettingsForm extends ConfigFormBase {
   protected $cache;
 
   /**
+   * Activity Finder backend plugin manager.
+   *
+   * @var \Drupal\openy_activity_finder\ActivityFinderBackendPluginManager
+   */
+  protected $afBackendPluginManager;
+
+  /**
    * SettingsForm constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -59,13 +67,16 @@ class SettingsForm extends ConfigFormBase {
    *   The http_client.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   Cache backend.
+   * @param \Drupal\openy_activity_finder\ActivityFinderBackendPluginManager $af_backend_plugin_manager
+   *   Activity Finder backend plugin manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, Client $http_client, CacheBackendInterface $cache) {
+  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, Client $http_client, CacheBackendInterface $cache, ActivityFinderBackendPluginManager $af_backend_plugin_manager) {
     parent::__construct($config_factory);
     $this->moduleHandler = $module_handler;
     $this->entityTypeManager = $entity_type_manager;
     $this->httpClient = $http_client;
     $this->cache = $cache;
+    $this->afBackendPluginManager = $af_backend_plugin_manager;
   }
 
   /**
@@ -77,7 +88,8 @@ class SettingsForm extends ConfigFormBase {
       $container->get('module_handler'),
       $container->get('entity_type.manager'),
       $container->get('http_client'),
-      $container->get('cache.render')
+      $container->get('cache.render'),
+      $container->get('plugin.manager.activity_finder.backend')
     );
   }
 
@@ -106,12 +118,8 @@ class SettingsForm extends ConfigFormBase {
     $form_state->setCached(FALSE);
 
     $backend_options = [];
-    if ($this->moduleHandler->moduleExists('search_api')) {
-      $backend_options['openy_activity_finder.solr_backend'] = 'Solr Backend (local db)';
-    }
-
-    if ($this->moduleHandler->moduleExists('openy_daxko2')){
-      $backend_options['openy_daxko2.openy_activity_finder_backend'] = $this->t('Daxko 2 (live API calls)');
+    foreach ($this->afBackendPluginManager->getDefinitions() as $plugin_id => $plugin) {
+      $backend_options[$plugin_id] = $plugin['label'];
     }
 
     $form['backend'] = [

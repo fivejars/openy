@@ -8,10 +8,11 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Path\AliasManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\openy_activity_finder\OpenyActivityFinderSolrBackend;
+use Drupal\openy_activity_finder\ActivityFinderBackendPluginBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\openy_activity_finder\ActivityFinderBackendPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -54,6 +55,20 @@ class ActivityFinderBlock extends BlockBase implements ContainerFactoryPluginInt
   protected $routeMatch;
 
   /**
+   * The Activity Finder backend plugin.
+   *
+   * @var \Drupal\openy_activity_finder\ActivityFinderBackendInterface
+   */
+  protected $backend;
+
+  /**
+   * The plugin id of Activity Finder backend.
+   *
+   * @var string
+   */
+  protected $backend_plugin_id;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -63,13 +78,17 @@ class ActivityFinderBlock extends BlockBase implements ContainerFactoryPluginInt
     ConfigFactoryInterface $config_factory,
     QueryFactory $entity_query,
     AliasManagerInterface $alias_manager,
-    RouteMatchInterface $route_match
+    RouteMatchInterface $route_match,
+    ActivityFinderBackendPluginManager $af_backend_plugin_manager
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->configFactory = $config_factory;
     $this->entityQuery = $entity_query;
     $this->aliasManager = $alias_manager;
     $this->routeMatch = $route_match;
+
+    $this->backend_plugin_id = $this->configFactory->get('openy_activity_finder.settings')->get('backend');
+    $this->backend = $af_backend_plugin_manager->createInstance($this->backend_plugin_id);
   }
 
   /**
@@ -83,17 +102,15 @@ class ActivityFinderBlock extends BlockBase implements ContainerFactoryPluginInt
       $container->get('config.factory'),
       $container->get('entity.query'),
       $container->get('path.alias_manager'),
-      $container->get('current_route_match')
-  );
+      $container->get('current_route_match'),
+      $container->get('plugin.manager.activity_finder.backend')
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function build() {
-    $config = $this->configFactory->get('openy_activity_finder.settings');
-    $backend_service_id = $config->get('backend');
-    $backend = \Drupal::service($backend_service_id);
     $node = $this->routeMatch->getParameter('node');
     $alias = '';
     if ($node instanceof NodeInterface) {
@@ -101,7 +118,7 @@ class ActivityFinderBlock extends BlockBase implements ContainerFactoryPluginInt
     }
 
     $locationsMapping = [];
-    if ($backend_service_id == 'openy_daxko2.openy_activity_finder_backend') {
+    if ($this->backend_plugin_id == 'openy_daxko2.openy_activity_finder_backend') {
       $openy_daxko2_config = $this->configFactory->get('openy_daxko2.settings');
       if (!empty($openy_daxko2_config->get('locations'))) {
         $nids = $this->entityQuery
@@ -126,18 +143,18 @@ class ActivityFinderBlock extends BlockBase implements ContainerFactoryPluginInt
     return [
       '#theme' => 'openy_activity_finder_program_search',
       '#data' => [],
-      '#ages' => $backend->getAges(),
-      '#days' => $backend->getDaysOfWeek(),
-      '#categories' => $backend->getCategoriesTopLevel(),
-      '#categories_type' => $backend->getCategoriesType(),
-      '#activities' => $backend->getCategories(),
-      '#locations' => $backend->getLocations(),
-      '#expanderSectionsConfig' => $config->getRawData(),
+      '#ages' => $this->backend->getAges(),
+      '#days' => $this->backend->getDaysOfWeek(),
+      '#categories' => $this->backend->getCategoriesTopLevel(),
+      '#categories_type' => $this->backend->getCategoriesType(),
+      '#activities' => $this->backend->getCategories(),
+      '#locations' => $this->backend->getLocations(),
+      '#expanderSectionsConfig' => $this->configFactory->get('openy_activity_finder.settings')->getRawData(),
       '#attached' => [
         'drupalSettings' => [
           'activityFinder' => [
             'alias' => $alias,
-            'is_search_box_disabled' => $config->get('disable_search_box'),
+            'is_search_box_disabled' => $this->configFactory->get('openy_activity_finder.settings')->get('disable_search_box'),
             'locationsNidToDaxkoIdMapping' => $locationsMapping,
           ],
         ],
@@ -154,7 +171,8 @@ class ActivityFinderBlock extends BlockBase implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    return Cache::mergeTags(parent::getCacheTags(), [OpenyActivityFinderSolrBackend::ACTIVITY_FINDER_CACHE_TAG]);
+    // TODO: TEST if const work correctly.
+    return Cache::mergeTags(parent::getCacheTags(), [ActivityFinderBackendPluginBase::ACTIVITY_FINDER_CACHE_TAG]);
   }
 
 }

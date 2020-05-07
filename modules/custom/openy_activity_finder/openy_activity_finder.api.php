@@ -22,7 +22,7 @@ function hook_activity_finder_program_search_results_alter(&$data) {
  * @param \Drupal\node\NodeInterface $entity
  *   The node that has just been processed.
  *
- * @see Drupal\openy_activity_finder\OpenyActivityFinderSolrBackend
+ * @see Drupal\openy_activity_finder\Plugin\ActivityFinderBackend\OpenyActivityFinderSolrBackend
  */
 function hook_activity_finder_program_process_results_alter(array &$data, NodeInterface $entity) {
   $data['description'] = t('Test session description');

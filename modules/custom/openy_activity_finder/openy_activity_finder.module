@@ -7,7 +7,7 @@
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\openy_activity_finder\OpenyActivityFinderSolrBackend;
+use Drupal\openy_activity_finder\ActivityFinderBackendPluginBase;
 
 /**
  * Implements hook_theme().
@@ -78,5 +78,5 @@ function _openy_activity_finder_invalidate_cache($entity) {
   }
 
   // Invalidate activity finder cache.
-  Cache::invalidateTags([OpenyActivityFinderSolrBackend::ACTIVITY_FINDER_CACHE_TAG]);
+  Cache::invalidateTags([ActivityFinderBackendPluginBase::ACTIVITY_FINDER_CACHE_TAG]);
 }
