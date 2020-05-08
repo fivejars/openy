@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\TrustedRedirectResponse;
+use Drupal\openy_activity_finder\ActivityFinderBackendPluginBase;
 use Drupal\openy_activity_finder\ActivityFinderBackendPluginManager;
 use Drupal\openy_activity_finder\Entity\ProgramSearchLog;
 use Drupal\openy_activity_finder\Entity\ProgramSearchCheckLog;
@@ -119,7 +120,7 @@ class ActivityFinderController extends ControllerBase {
 
       // Cache for 5 minutes.
       $expire = $this->time->getRequestTime() + self::CACHE_LIFETIME;
-      $this->cacheBackend->set($cid, $data, $expire, [OpenyActivityFinderSolrBackend::ACTIVITY_FINDER_CACHE_TAG]);
+      $this->cacheBackend->set($cid, $data, $expire, [ActivityFinderBackendPluginBase::ACTIVITY_FINDER_CACHE_TAG]);
     }
 
     return new JsonResponse($data);
@@ -169,7 +170,7 @@ class ActivityFinderController extends ControllerBase {
 
       // Cache for 5 minutes.
       $expire = $this->time->getRequestTime() + self::CACHE_LIFETIME;
-      $this->cacheBackend->set($cid, $data, $expire, [OpenyActivityFinderSolrBackend::ACTIVITY_FINDER_CACHE_TAG]);
+      $this->cacheBackend->set($cid, $data, $expire, [ActivityFinderBackendPluginBase::ACTIVITY_FINDER_CACHE_TAG]);
     }
 
     return new JsonResponse($data);
