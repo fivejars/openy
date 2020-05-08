@@ -3,11 +3,12 @@
 namespace Drupal\openy_activity_finder;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 
 /**
  * Defines an interface for Activity Finder backend plugins.
  */
-interface ActivityFinderBackendInterface extends PluginInspectionInterface {
+interface ActivityFinderBackendInterface extends PluginInspectionInterface, ContainerFactoryPluginInterface {
 
   /**
    * Run Programs search.

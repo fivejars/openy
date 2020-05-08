@@ -4,6 +4,7 @@ namespace Drupal\openy_activity_finder;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Plugin\PluginBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /*
  * Base implementation for Activity Finder backend plugins.
@@ -15,11 +16,15 @@ abstract class ActivityFinderBackendPluginBase extends PluginBase implements Act
 
   /**
    * Activity Finder configuration.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $config;
 
   /**
    * Site's default timezone.
+   *
+   * @var string
    */
   protected $timezone;
 
@@ -39,6 +44,18 @@ abstract class ActivityFinderBackendPluginBase extends PluginBase implements Act
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->config = $config_factory->get('openy_activity_finder.settings');
     $this->timezone = new \DateTimeZone($config_factory->get('system.date')->get('timezone')['default']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('config.factory')
+    );
   }
 
   /**

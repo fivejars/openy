@@ -5,11 +5,10 @@ namespace Drupal\openy_activity_finder\Plugin\ActivityFinderBackend;
 use DateTimeInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\openy_activity_finder\ActivityFinderBackendPluginBase;
@@ -17,8 +16,9 @@ use Drupal\openy_activity_finder\Annotation\ActivityFinderBackend;
 use Drupal\search_api\Entity\Index;
 use Drupal\Core\Url;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\search_api\SearchApiException;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Activity Finder Solr backend plugin.
@@ -36,7 +36,6 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
 
   // Number of results to retrieve per page.
   const TOTAL_RESULTS_PER_PAGE = 25;
-
 
   /**
    * Cache default.
@@ -62,7 +61,7 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
   /**
    * The EntityTypeManager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManager
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entity_type_manager;
 
@@ -102,41 +101,206 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
   protected $entityTypeManager;
 
   /**
-   * Constructs Activity Finder Solr Backend plugin.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param CacheBackendInterface $cache
-   *   Cache default.
-   * @param Connection $database
-   *   The Database connection.
-   * @param EntityTypeManager $entity_type_manager
-   *   The EntityTypeManager.
-   * @param DateFormatterInterface $date_formatter
-   *   The Date formatter.
-   * @param TimeInterface $time
-   *   Time service.
-   * @param LoggerChannelInterface $loggerChannel
-   *   Logger service.
-   * @param ModuleHandlerInterface $module_handler
-   *   Module Handler.
+   * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, CacheBackendInterface $cache, Connection $database, QueryFactory $entity_query, EntityTypeManager $entity_type_manager, DateFormatterInterface $date_formatter, TimeInterface $time, LoggerChannelInterface $loggerChannel, ModuleHandlerInterface $module_handler) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $config_factory);
-    $this->cache = $cache;
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    /** @var static $instance */
+    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+
+    $instance->setCacheBackend($container->get('cache.default'));
+    $instance->setDatabase($container->get('database'));
+    $instance->setEntityQuery($container->get('entity.query'));
+    $instance->setEntityTypeManager($container->get('entity_type.manager'));
+    $instance->setDateFormatter($container->get('date.formatter'));
+    $instance->setTimeService($container->get('datetime.time'));
+    $instance->setLogger($container->get('logger.channel.default'));
+    $instance->setModuleHandler($container->get('module_handler'));
+
+    return $instance;
+  }
+
+  /**
+   * Sets the Cache backend to use for this plugin.
+   *
+   * @param CacheBackendInterface $cache_backend
+   *   The Cache default to use for this plugin.
+   *
+   * @return $this
+   */
+  public function setCacheBackend(CacheBackendInterface $cache_backend) {
+    $this->cache = $cache_backend;
+    return $this;
+  }
+
+  /**
+   * Returns the module handler to use for this plugin.
+   *
+   * @return CacheBackendInterface
+   *   The module handler.
+   */
+  public function getCacheBackend() {
+    return $this->cache;
+  }
+
+  /**
+   * Sets the the database connection to use for this plugin.
+   *
+   * @param Connection $database
+   *   The database connection to use for this plugin.
+   *
+   * @return $this
+   */
+  public function setDatabase(Connection $database) {
     $this->database = $database;
+    return $this;
+  }
+
+  /**
+   * Returns the database connection to use for this plugin.
+   *
+   * @return Connection
+   *   The module handler.
+   */
+  public function getDatabase() {
+    return $this->database;
+  }
+
+  /**
+   * Sets the module handler to use for this plugin.
+   *
+   * @param QueryFactory $entity_query
+   *   The module handler to use for this plugin.
+   *
+   * @return $this
+   */
+  public function setEntityQuery(QueryFactory $entity_query) {
     $this->entityQuery = $entity_query;
+    return $this;
+  }
+
+  /**
+   * Returns the module handler to use for this plugin.
+   *
+   * @return QueryFactory
+   *   The module handler.
+   */
+  public function getEntityQuery() {
+    return $this->entityQuery;
+  }
+
+  /**
+   * Retrieves the entity type manager service.
+   *
+   * @return \Drupal\Core\Entity\EntityTypeManagerInterface
+   *   The entity type manager service.
+   */
+  public function getEntityTypeManager() {
+    return $this->entityTypeManager ?: \Drupal::entityTypeManager();
+  }
+
+  /**
+   * Sets the entity type manager service.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager service.
+   *
+   * @return $this
+   */
+  public function setEntityTypeManager(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
+    return $this;
+  }
+
+  /**
+   * Retrieves the date formatter.
+   *
+   * @return \Drupal\Core\Datetime\DateFormatterInterface
+   *   The date formatter.
+   */
+  public function getDateFormatter() {
+    return $this->dateFormatter;
+  }
+
+  /**
+   * Sets the date formatter.
+   *
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   *   The new date formatter.
+   *
+   * @return $this
+   */
+  public function setDateFormatter(DateFormatterInterface $date_formatter) {
     $this->dateFormatter = $date_formatter;
-    $this->time = $time;
-    $this->loggerChannel = $loggerChannel;
+    return $this;
+  }
+
+  /**
+   * Retrieves the time service.
+   *
+   * @return \Drupal\Component\Datetime\TimeInterface
+   *   The time service.
+   */
+  public function getTimeService() {
+    return $this->time;
+  }
+
+  /**
+   * Sets the time service.
+   *
+   * @param \Drupal\Component\Datetime\TimeInterface $time_service
+   *   The new time service.
+   *
+   * @return $this
+   */
+  public function setTimeService(TimeInterface $time_service) {
+    $this->time = $time_service;
+    return $this;
+  }
+
+  /**
+   * Retrieves the logger.
+   *
+   * @return \Psr\Log\LoggerInterface
+   *   The logger.
+   */
+  public function getLogger() {
+    return $this->loggerChannel;
+  }
+
+  /**
+   * Sets the logger.
+   *
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The new logger.
+   *
+   * @return $this
+   */
+  public function setLogger(LoggerInterface $logger) {
+    $this->loggerChannel = $logger;
+    return $this;
+  }
+
+  /**
+   * Returns the module handler to use for this plugin.
+   *
+   * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   *   The module handler.
+   */
+  public function getModuleHandler() {
+    return $this->moduleHandler ?: \Drupal::moduleHandler();
+  }
+
+  /**
+   * Sets the module handler to use for this plugin.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler to use for this plugin.
+   *
+   * @return $this
+   */
+  public function setModuleHandler(ModuleHandlerInterface $module_handler) {
     $this->moduleHandler = $module_handler;
+    return $this;
   }
 
   /**
@@ -304,7 +468,7 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
       $query->setOption('search_api_facets', $filters);
     }
     else {
-      $this->loggerChannel->info(t('Search server doesn\'t support facets (filters). '));
+      $this->getLogger()->info(t('Search server doesn\'t support facets (filters). '));
     }
     $query->addTag('af_search');
     $results = $query->execute();
@@ -323,14 +487,14 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
       try {
         $entity = $result_item->getOriginalObject()->getValue();
         if (!$entity) {
-          $this->loggerChannel->error('Failed to load original object ' . $this->itemId);
+          $this->getLogger()->error('Failed to load original object ' . $this->itemId);
           continue;
         }
       }
       catch (SearchApiException $e) {
         // If we couldn't load the object, just log an error and fail
         // silently to set the values.
-        $this->loggerChannel->error($e);
+        $this->getLogger()->error($e);
         continue;
       }
       $fields = $result_item->getFields();
@@ -444,7 +608,7 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
       ];
 
       // Allow other modules to alter the process results.
-      $this->moduleHandler
+      $this->getModuleHandler()
         ->alter('activity_finder_program_process_results', $item_data, $entity);
 
       $data[] = $item_data;
@@ -566,17 +730,17 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
   public function getCategoryProgramInfo() {
     $data = [];
     $cid = 'openy_activity_finder:activity_program_info';
-    if ($cache = $this->cache->get($cid)) {
+    if ($cache = $this->getCacheBackend()->get($cid)) {
       $data = $cache->data;
     }
     else {
-      $nids = $this->entityQuery
+      $nids = $this->getEntityQuery()
         ->get('node')
         ->condition('type', 'program_subcategory')
         ->execute();
       $nids_chunked = array_chunk($nids, 20, TRUE);
       foreach ($nids_chunked as $chunked) {
-        $program_subcategories = $this->entityTypeManager->getStorage('node')->loadMultiple($chunked);
+        $program_subcategories = $this->getEntityTypeManager()->getStorage('node')->loadMultiple($chunked);
         if (!empty($program_subcategories)) {
           foreach ($program_subcategories as $program_subcategory_node) {
             if ($program_node = $program_subcategory_node->field_category_program->entity) {
@@ -592,8 +756,8 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
         }
       }
 
-      $expire = $this->time->getRequestTime() + self::CACHE_TTL;
-      $this->cache->set($cid, $data, $expire, [self::ACTIVITY_FINDER_CACHE_TAG]);
+      $expire = $this->getTimeService()->getRequestTime() + self::CACHE_TTL;
+      $this->getCacheBackend()->set($cid, $data, $expire, [self::ACTIVITY_FINDER_CACHE_TAG]);
     }
 
     return $data;
@@ -605,11 +769,11 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
   public function getLocationsInfo() {
     $data = [];
     $cid = 'openy_activity_finder:locations_info';
-    if ($cache = $this->cache->get($cid)) {
+    if ($cache = $this->getCacheBackend()->get($cid)) {
       $data = $cache->data;
     }
     else {
-      $nids = $this->entityQuery
+      $nids = $this->getEntityQuery()
         ->get('node')
         ->condition('type', ['branch', 'camp', 'facility'], 'IN')
         ->condition('status', 1)
@@ -617,7 +781,7 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
         ->execute();
       $nids_chunked = array_chunk($nids, 20, TRUE);
       foreach ($nids_chunked as $chunked) {
-        $locations = $this->entityTypeManager->getStorage('node')->loadMultiple($chunked);
+        $locations = $this->getEntityTypeManager()->getStorage('node')->loadMultiple($chunked);
         if (!empty($locations)) {
           foreach ($locations as $location) {
             $address = [];
@@ -662,8 +826,8 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
           }
         }
       }
-      $expire = $this->time->getRequestTime() + self::CACHE_TTL;
-      $this->cache->set($cid, $data, $expire, [self::ACTIVITY_FINDER_CACHE_TAG]);
+      $expire = $this->getTimeService()->getRequestTime() + self::CACHE_TTL;
+      $this->getCacheBackend()->set($cid, $data, $expire, [self::ACTIVITY_FINDER_CACHE_TAG]);
     }
 
     return $data;

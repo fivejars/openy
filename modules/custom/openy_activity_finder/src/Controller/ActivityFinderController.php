@@ -7,11 +7,9 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\TrustedRedirectResponse;
-use Drupal\openy_activity_finder\ActivityFinderBackendInterface;
+use Drupal\openy_activity_finder\ActivityFinderBackendPluginManager;
 use Drupal\openy_activity_finder\Entity\ProgramSearchLog;
-use Drupal\openy_activity_finder\OpenyActivityFinderBackendInterface;
 use Drupal\openy_activity_finder\Entity\ProgramSearchCheckLog;
-use Drupal\openy_activity_finder\OpenyActivityFinderSolrBackend;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -49,25 +47,26 @@ class ActivityFinderController extends ControllerBase {
    *   Cache backend.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
+   * @param \Drupal\openy_activity_finder\ActivityFinderBackendPluginManager $af_backend_plugin_manager
+   *   Activity Finder backend plugin manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, CacheBackendInterface $cacheBackend, TimeInterface $time) {
+  public function __construct(ConfigFactoryInterface $config_factory, CacheBackendInterface $cacheBackend, TimeInterface $time, ActivityFinderBackendPluginManager $af_backend_plugin_manager) {
     $this->cacheBackend = $cacheBackend;
     $this->time = $time;
 
-    $config = $config_factory->get('openy_activity_finder.settings')->get('backend');
-    $this->backend = $backend;
+    $plugin_id = $config_factory->get('openy_activity_finder.settings')->get('backend');
+    $this->backend = $af_backend_plugin_manager->createInstance($plugin_id);
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-//    $config = $container->get('config.factory')->get('openy_activity_finder.settings');
-
     return new static(
       $container->get('config.factory'),
       $container->get('cache.default'),
-      $container->get('datetime.time')
+      $container->get('datetime.time'),
+      $container->get('plugin.manager.activity_finder.backend')
     );
   }
 

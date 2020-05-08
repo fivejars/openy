@@ -171,7 +171,6 @@ class ActivityFinderBlock extends BlockBase implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    // TODO: TEST if const work correctly.
     return Cache::mergeTags(parent::getCacheTags(), [ActivityFinderBackendPluginBase::ACTIVITY_FINDER_CACHE_TAG]);
   }
 
