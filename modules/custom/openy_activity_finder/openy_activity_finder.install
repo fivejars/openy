@@ -67,3 +67,22 @@ function openy_activity_finder_update_8005() {
     $cim->importConfigs(['search_api.index.default']);
   }
 }
+
+/**
+ * Update config backend value, to use plugin system instead of services.
+ */
+function openy_activity_finder_update_8006() {
+  $replaced_values = [
+    'openy_activity_finder.solr_backend' => 'solr',
+    'openy_daxko2.openy_activity_finder_backend' => 'daxko'
+  ];
+
+  /** @var \Drupal\Core\Config\Config $config */
+  $config = \Drupal::service('config.factory')->getEditable('openy_activity_finder.settings');
+  $old_value = $config->get('backend');
+
+  if (array_key_exists($old_value, $replaced_values)) {
+    $config->set('backend', $replaced_values[$old_value]);
+    $config->save();
+  }
+}

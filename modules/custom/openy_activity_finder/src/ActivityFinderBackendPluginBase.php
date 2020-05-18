@@ -6,7 +6,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/*
+/**
  * Base implementation for Activity Finder backend plugins.
  */
 abstract class ActivityFinderBackendPluginBase extends PluginBase implements ActivityFinderBackendInterface {

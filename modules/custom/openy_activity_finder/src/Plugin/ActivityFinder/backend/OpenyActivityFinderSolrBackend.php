@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\openy_activity_finder\Plugin\ActivityFinderBackend;
+namespace Drupal\openy_activity_finder\Plugin\ActivityFinder\backend;
 
 use DateTimeInterface;
 use Drupal\Component\Datetime\TimeInterface;
@@ -52,20 +52,6 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
   protected $database;
 
   /**
-   * The entity query factory.
-   *
-   * @var \Drupal\Core\Entity\Query\QueryFactory
-   */
-  protected $entityQuery;
-
-  /**
-   * The EntityTypeManager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entity_type_manager;
-
-  /**
    * The date formatter service.
    *
    * @var \Drupal\Core\Datetime\DateFormatterInterface
@@ -109,7 +95,6 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
 
     $instance->setCacheBackend($container->get('cache.default'));
     $instance->setDatabase($container->get('database'));
-    $instance->setEntityQuery($container->get('entity.query'));
     $instance->setEntityTypeManager($container->get('entity_type.manager'));
     $instance->setDateFormatter($container->get('date.formatter'));
     $instance->setTimeService($container->get('datetime.time'));
@@ -163,29 +148,6 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
    */
   public function getDatabase() {
     return $this->database;
-  }
-
-  /**
-   * Sets the module handler to use for this plugin.
-   *
-   * @param QueryFactory $entity_query
-   *   The module handler to use for this plugin.
-   *
-   * @return $this
-   */
-  public function setEntityQuery(QueryFactory $entity_query) {
-    $this->entityQuery = $entity_query;
-    return $this;
-  }
-
-  /**
-   * Returns the module handler to use for this plugin.
-   *
-   * @return QueryFactory
-   *   The module handler.
-   */
-  public function getEntityQuery() {
-    return $this->entityQuery;
   }
 
   /**
@@ -734,13 +696,13 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
       $data = $cache->data;
     }
     else {
-      $nids = $this->getEntityQuery()
-        ->get('node')
+      $node_storage =$this->getEntityTypeManager()->getStorage('node');
+      $nids = $node_storage->getQuery()
         ->condition('type', 'program_subcategory')
         ->execute();
       $nids_chunked = array_chunk($nids, 20, TRUE);
       foreach ($nids_chunked as $chunked) {
-        $program_subcategories = $this->getEntityTypeManager()->getStorage('node')->loadMultiple($chunked);
+        $program_subcategories = $node_storage->loadMultiple($chunked);
         if (!empty($program_subcategories)) {
           foreach ($program_subcategories as $program_subcategory_node) {
             if ($program_node = $program_subcategory_node->field_category_program->entity) {
@@ -773,15 +735,15 @@ class OpenyActivityFinderSolrBackend extends ActivityFinderBackendPluginBase {
       $data = $cache->data;
     }
     else {
-      $nids = $this->getEntityQuery()
-        ->get('node')
+      $node_storage = $this->getEntityTypeManager()->getStorage('node');
+      $nids = $node_storage->getQuery()
         ->condition('type', ['branch', 'camp', 'facility'], 'IN')
         ->condition('status', 1)
         ->sort('title', 'ASC')
         ->execute();
       $nids_chunked = array_chunk($nids, 20, TRUE);
       foreach ($nids_chunked as $chunked) {
-        $locations = $this->getEntityTypeManager()->getStorage('node')->loadMultiple($chunked);
+        $locations = $node_storage->loadMultiple($chunked);
         if (!empty($locations)) {
           foreach ($locations as $location) {
             $address = [];
