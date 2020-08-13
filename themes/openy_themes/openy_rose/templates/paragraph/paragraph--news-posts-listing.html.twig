@@ -48,5 +48,5 @@ view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
   {% if not paragraph.field_prgf_title.isEmpty() %}
     <h2 class="h1">{{ content.field_prgf_title }}</h2>
   {% endif %}
-  {{ content }}
+  {{ content|without('field_prgf_title') }}
 </div>
