@@ -1,2 +1,10 @@
 {% extends '@openy_prgf_featured_highlights/paragraph--featured-highlights--default.html.twig' %}
-{% set classes = ['mb-4'] %}
+{% set classes = [
+    'container',
+    'mb-4',
+    'paragraph',
+    'featured-highlights',
+    'paragraph--type--' ~ paragraph.bundle|clean_class,
+    view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
+]|merge(classes|default([]))
+%}

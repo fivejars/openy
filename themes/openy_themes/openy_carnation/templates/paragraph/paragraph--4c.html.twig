@@ -41,7 +41,6 @@
     'paragraph',
     'block-description--wrapper',
     'block-description--4',
-    'row'
   ]
 %}
 
@@ -49,6 +48,8 @@
   {% set classes = classes|merge(['block-description--wrapper--outline--top']) %}
 {% endif %}
 
-<div{{ attributes.addClass(classes) }}>
-  {{ content }}
+<div class="container">
+  <div{{ attributes.addClass(classes) }}>
+    {{ content }}
+  </div>
 </div>
