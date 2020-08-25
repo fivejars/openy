@@ -217,6 +217,7 @@
 
   .views-row {
     display: flex;
+    flex-grow: 0;
     flex-basis: 100%;
 
     @media (min-width: 600px) and (max-width: 1025px) {
@@ -242,5 +243,18 @@
     clear: both;
     margin-top: 0;
     font-weight: bold;
+  }
+}
+
+.landing-content.two-column {
+  .locations-list {
+    .views-row__wrapper {
+      .views-row {
+        @media (min-width: 1025px) {
+          flex-basis: 50%;
+          max-width: 33.33%;
+        }
+      }
+    }
   }
 }
