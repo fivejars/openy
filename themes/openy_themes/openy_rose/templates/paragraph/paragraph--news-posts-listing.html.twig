@@ -43,12 +43,10 @@ set classes = [
 view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
 ]
 %}
-{% if content.field_prgf_title.0 is empty %}
-  {% set title = 'Latest news & Updates'|t %}
-{% else %}
-  {% set title = content.field_prgf_title.0 %}
-{% endif %}
+
 <div{{ attributes.addClass(classes) }}>
-  <h2 class="h1">{{ title }}</h2>
+  {% if not paragraph.field_prgf_title.isEmpty() %}
+    <h2 class="h1">{{ content.field_prgf_title }}</h2>
+  {% endif %}
   {{ content|without('field_prgf_title') }}
 </div>
