@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Open Y Carnation install file.
+ */
+
+/**
+ * Add carnation_banner_1920_700 image style.
+ */
+function openy_carnation_update_8001() {
+  $config_dir = drupal_get_path('theme', 'openy_carnation') . '/config/install/';
+  // Import configuration.
+  $config_importer = \Drupal::service('openy_upgrade_tool.importer');
+  $config_importer->setDirectory($config_dir);
+  $config_importer->importConfigs([
+    'image.style.carnation_banner_1920_700'
+  ]);
+}
