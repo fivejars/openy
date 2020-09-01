@@ -6,7 +6,7 @@ dependencies:
   module:
     - openy_focal_point
 name: carnation_banner_1920_700
-label: 'Paragraph banner (1920x700)'
+label: 'Carnation banner (1920x700)'
 effects:
   11e1b4c9-ba1c-41ed-b6b9-82ce6491bb04:
     uuid: 11e1b4c9-ba1c-41ed-b6b9-82ce6491bb04
