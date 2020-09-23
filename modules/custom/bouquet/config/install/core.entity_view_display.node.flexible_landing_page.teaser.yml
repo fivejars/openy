@@ -1,0 +1,32 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.flexible_landing_page.body
+    - node.type.flexible_landing_page
+  module:
+    - text
+    - user
+id: node.flexible_landing_page.teaser
+targetEntityType: node
+bundle: flexible_landing_page
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: text_summary_or_trimmed
+    weight: 0
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  addthis: true
+  langcode: true
+  search_api_excerpt: true

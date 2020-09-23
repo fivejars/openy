@@ -1,0 +1,30 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.flexible_landing_page.body
+    - node.type.flexible_landing_page
+  module:
+    - text
+    - user
+id: node.flexible_landing_page.default
+targetEntityType: node
+bundle: flexible_landing_page
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  addthis: true
+  langcode: true
+  search_api_excerpt: true
