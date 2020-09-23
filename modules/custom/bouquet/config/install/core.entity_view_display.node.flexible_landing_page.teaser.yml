@@ -4,6 +4,7 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - field.field.node.flexible_landing_page.body
+    - field.field.node.flexible_landing_page.layout_builder__layout
     - node.type.flexible_landing_page
   module:
     - text
@@ -29,4 +30,5 @@ content:
 hidden:
   addthis: true
   langcode: true
+  layout_builder__layout: true
   search_api_excerpt: true
