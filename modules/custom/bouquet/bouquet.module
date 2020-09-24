@@ -4,3 +4,60 @@
  * @file
  * General functions and hook implementations.
  */
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Render\Element;
+
+
+/**
+ * Implements hook_plugin_filter_TYPE__CONSUMER_alter().
+ */
+function bouquet_plugin_filter_layout__layout_builder_alter(array &$definitions, array $extra) {
+  // Remove not used layouts.
+  $layouts = [
+    'layout_onecol',
+    'layout_twocol_section',
+    'layout_threecol_section',
+    'layout_fourcol_section',
+    'bootstrap_layout_builder:blb_col_4',
+    'bootstrap_layout_builder:blb_col_5',
+    'bootstrap_layout_builder:blb_col_6',
+    'bootstrap_layout_builder:blb_col_7',
+    'bootstrap_layout_builder:blb_col_8',
+    'bootstrap_layout_builder:blb_col_9',
+    'bootstrap_layout_builder:blb_col_10',
+    'bootstrap_layout_builder:blb_col_11',
+    'bootstrap_layout_builder:blb_col_12',
+  ];
+
+  foreach ($layouts as $layout) {
+    /** @var \Drupal\Core\Layout\LayoutDefinition[] $definitions */
+    if (isset($definitions[$layout])) {
+      unset($definitions[$layout]);
+    }
+  }
+
+}
+
+/**
+ * Implements hook_entity_view_alter().
+ */
+function bouquet_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  // todo: find more elegant way to set attributes to container instead of container wrapper.
+  if (isset($build['_layout_builder']) && !Element::isEmpty($build['_layout_builder'])) {
+    foreach ($build['_layout_builder'] as &$section) {
+      if (isset($section['#theme']) && $section['#theme'] == 'blb_section') {
+        foreach ($section['#theme_wrappers']['blb_container_wrapper']['#attributes'] as $key => $wrapper_attr) {
+          if (!empty($section['#theme_wrappers']['blb_container']['#attributes'][$key])) {
+            $section['#theme_wrappers']['blb_container']['#attributes'][$key] = array_merge($wrapper_attr, $section['#theme_wrappers']['blb_container']['#attributes'][$key]);
+          }
+          else {
+            $section['#theme_wrappers']['blb_container']['#attributes'][$key] = $wrapper_attr;
+          }
+          unset($section['#theme_wrappers']['blb_container_wrapper']['#attributes'][$key]);
+        }
+      }
+    }
+  }
+}

@@ -295,6 +295,9 @@
         "drupal/geysir": "^1.2",
         "drupal/media_directories": "^1.0",
         "drupal/editor_advanced_link": "^1.6",
-        "drupal/link_attributes": "^1.10"
+        "drupal/link_attributes": "^1.10",
+        "drupal/bootstrap_layout_builder": "^2",
+        "drupal/layout_builder_modal": "^1.1",
+        "drupal/layout_builder_browser": "^1.1"
     }
 }

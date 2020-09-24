@@ -2,6 +2,32 @@
   background-color: #0089d0;
 }
 
+.bg-openy-bouquet-dark-blue {
+  background-color: #0060af !important;
+}
+
+.bg-openy-bouquet-dark-green {
+  background-color: #006b6b !important;;
+}
+
+.bg-openy-bouquet-dark-grey {
+  background-color: #636466 !important;;
+}
+
 .block-inline-blockimage img {
   width: 100%;
+}
+
+.ui-dialog .ui-dialog-titlebar-close {
+  position: absolute;
+  top: calc(50% - 6px);
+  right: 1em;
+  width: 30px;
+  height: 30px;
+  transition: all 0.5s ease;
+  border: 3px solid transparent;
+  background-color: transparent !important;
+  background-image: url('/core/themes/stable/images/core/icons/bebebe/ex.svg') !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
 }

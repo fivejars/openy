@@ -1,0 +1,17 @@
+langcode: en
+status: true
+dependencies: {  }
+id: blocks
+label: Blocks
+weight: null
+blocks:
+  -
+    block_id: 'inline_block:basic_block'
+    weight: 0
+    image_path: ''
+    image_alt: ''
+  -
+    block_id: 'inline_block:image'
+    weight: 0
+    image_path: ''
+    image_alt: ''

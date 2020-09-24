@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update routines.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function bouquet_install() {
+  $config_dir = drupal_get_path('module', 'bouquet') . '/config/override/';
+  $config_updater = \Drupal::service('openy_upgrade_tool.param_updater');
+  $config_updater->update(
+    $config_dir . 'bootstrap_styles.settings.yml',
+    'bootstrap_styles.settings',
+    'background_colors'
+  );
+}

@@ -7,5 +7,7 @@ version: 8.x-1.0
 package: Open Y
 dependencies:
   - drupal:layout_builder
-  - drupal:bootstrap_layout_builder
+  - bootstrap_layout_builder:bootstrap_layout_builder
+  - layout_builder_modal:layout_builder_modal
+  - layout_builder_browser:layout_builder_browser
 
