@@ -1146,8 +1146,23 @@ function openy_update_8081() {
 }
 
 /**
- * Enable openy_bouquet module.
+ * Enable openy_bouquet theme and related modules.
  */
 function openy_update_8082() {
-  \Drupal::service('module_installer')->install(['bouquet']);
+  /** @var \Drupal\Core\Extension\ThemeInstaller $service */
+  $service = \Drupal::service('theme_installer');
+  $service->install(['openy_bouquet']);
+  \Drupal::configFactory()
+    ->getEditable('system.theme')
+    ->set('default', 'openy_bouquet')
+    ->save(TRUE);
+  $modules = [
+    'bouquet',
+    'bouquet_demo_content'
+  ];
+  foreach ($modules as $module) {
+    \Drupal::service('module_installer')->install([
+      $module,
+    ]);
+  }
 }

@@ -1,0 +1,533 @@
+<?php
+
+/**
+ * @file
+ * Install and update functions for bouquet_demo_content module.
+ */
+
+use Drupal\block_content\Entity\BlockContent;
+use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
+use Drupal\layout_builder\Section;
+use Drupal\layout_builder\SectionComponent;
+use Drupal\node\Entity\Node;
+
+/**
+ * Implements hook_install().
+ */
+function bouquet_demo_content_install() {
+  $sections_data = [
+    [
+      'layout' => 'blb_col_1',
+      'breakpoints' => [
+        'desktop' => 'blb_col_12',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_12',
+      ],
+      'container' => 'container',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-blue',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-12',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 1',
+          'body' => '1 column in a container',
+        ],
+      ],
+    ],
+    [
+      'layout' => 'blb_col_1',
+      'breakpoints' => [
+        'desktop' => 'blb_col_12',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_12',
+      ],
+      'container' => 'w-100',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-blue',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-12',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 2',
+          'body' => '1 column, full width',
+        ],
+      ],
+    ],
+    [
+      'layout' => 'blb_col_2',
+      'breakpoints' => [
+        'desktop' => 'blb_col_6_6',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_6_6',
+      ],
+      'container' => 'container',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-green',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-6',
+            1 => 'col-md-6',
+            2 => 'col-12',
+          ],
+        'blb_region_col_2' =>
+          [
+            0 => 'col-lg-6',
+            1 => 'col-md-6',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 3',
+          'body' => '50%',
+        ],
+        [
+          'region' => 'blb_region_col_2',
+          'title' => 'Block 4',
+          'body' => '50%',
+        ],
+      ],
+    ],
+    [
+      'layout' => 'blb_col_2',
+      'breakpoints' => [
+        'desktop' => 'blb_col_6_6',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_6_6',
+      ],
+      'container' => 'w-100',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-green',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-6',
+            1 => 'col-md-6',
+            2 => 'col-12',
+          ],
+        'blb_region_col_2' =>
+          [
+            0 => 'col-lg-6',
+            1 => 'col-md-6',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 5',
+          'body' => '50%',
+        ],
+        [
+          'region' => 'blb_region_col_2',
+          'title' => 'Block 6',
+          'body' => '50%',
+        ],
+      ],
+    ],
+    [
+      'layout' => 'blb_col_2',
+      'breakpoints' => [
+        'desktop' => 'blb_col_9_3',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_12',
+      ],
+      'container' => 'container',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-grey',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-9',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+        'blb_region_col_2' =>
+          [
+            0 => 'col-lg-3',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 7',
+          'body' => '75%',
+        ],
+        [
+          'region' => 'blb_region_col_2',
+          'title' => 'Block 8',
+          'body' => '25%',
+        ],
+      ],
+    ],
+    [
+      'layout' => 'blb_col_2',
+      'breakpoints' => [
+        'desktop' => 'blb_col_9_3',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_12',
+      ],
+      'container' => 'w-100',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-grey',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-9',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+        'blb_region_col_2' =>
+          [
+            0 => 'col-lg-3',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 9',
+          'body' => '75%',
+        ],
+        [
+          'region' => 'blb_region_col_2',
+          'title' => 'Block 10',
+          'body' => '25%',
+        ],
+      ],
+    ],
+    [
+      'layout' => 'blb_col_2',
+      'breakpoints' => [
+        'desktop' => 'blb_col_3_9',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_12',
+      ],
+      'container' => 'container',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-blue',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-3',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+        'blb_region_col_2' =>
+          [
+            0 => 'col-lg-9',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 11',
+          'body' => '25%',
+        ],
+        [
+          'region' => 'blb_region_col_2',
+          'title' => 'Block 12',
+          'body' => '75%',
+        ],
+      ],
+    ],
+    [
+      'layout' => 'blb_col_2',
+      'breakpoints' => [
+        'desktop' => 'blb_col_3_9',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_12',
+      ],
+      'container' => 'w-100',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-blue',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-3',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+        'blb_region_col_2' =>
+          [
+            0 => 'col-lg-9',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 13',
+          'body' => '25%',
+        ],
+        [
+          'region' => 'blb_region_col_2',
+          'title' => 'Block 14',
+          'body' => '75%',
+        ],
+      ],
+    ],
+    [
+      'layout' => 'blb_col_3',
+      'breakpoints' => [
+        'desktop' => 'blb_col_3_6_3',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_12',
+      ],
+      'container' => 'container',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-green',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-3',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+        'blb_region_col_2' =>
+          [
+            0 => 'col-lg-6',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+        'blb_region_col_3' =>
+          [
+            0 => 'col-lg-3',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 15',
+          'body' => '25%',
+        ],
+        [
+          'region' => 'blb_region_col_2',
+          'title' => 'Block 16',
+          'body' => '50%',
+        ],
+        [
+          'region' => 'blb_region_col_3',
+          'title' => 'Block 17',
+          'body' => '25%',
+        ],
+      ],
+    ],
+    [
+      'layout' => 'blb_col_3',
+      'breakpoints' => [
+        'desktop' => 'blb_col_3_6_3',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_12',
+      ],
+      'container' => 'w-100',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-green',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-3',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+        'blb_region_col_2' =>
+          [
+            0 => 'col-lg-6',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+        'blb_region_col_3' =>
+          [
+            0 => 'col-lg-3',
+            1 => 'col-md-12',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 18',
+          'body' => '25%',
+        ],
+        [
+          'region' => 'blb_region_col_2',
+          'title' => 'Block 19',
+          'body' => '50%',
+        ],
+        [
+          'region' => 'blb_region_col_3',
+          'title' => 'Block 20',
+          'body' => '25%',
+        ],
+      ],
+    ],
+    [
+      'layout' => 'blb_col_3',
+      'breakpoints' => [
+        'desktop' => 'blb_col_4_4_4',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_4_4_4',
+      ],
+      'container' => 'container',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-grey',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-4',
+            1 => 'col-md-4',
+            2 => 'col-12',
+          ],
+        'blb_region_col_2' =>
+          [
+            0 => 'col-lg-4',
+            1 => 'col-md-4',
+            2 => 'col-12',
+          ],
+        'blb_region_col_3' =>
+          [
+            0 => 'col-lg-4',
+            1 => 'col-md-4',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 21',
+          'body' => '33%',
+        ],
+        [
+          'region' => 'blb_region_col_2',
+          'title' => 'Block 22',
+          'body' => '33%',
+        ],
+        [
+          'region' => 'blb_region_col_3',
+          'title' => 'Block 23',
+          'body' => '33%',
+        ],
+      ],
+    ],
+    [
+      'layout' => 'blb_col_3',
+      'breakpoints' => [
+        'desktop' => 'blb_col_4_4_4',
+        'mobile' => 'blb_col_12',
+        'tablet' => 'blb_col_4_4_4',
+      ],
+      'container' => 'w-100',
+      'container_wrapper_background_color' => 'bg-openy-bouquet-dark-grey',
+      'layout_regions_classes' => [
+        'blb_region_col_1' =>
+          [
+            0 => 'col-lg-4',
+            1 => 'col-md-4',
+            2 => 'col-12',
+          ],
+        'blb_region_col_2' =>
+          [
+            0 => 'col-lg-4',
+            1 => 'col-md-4',
+            2 => 'col-12',
+          ],
+        'blb_region_col_3' =>
+          [
+            0 => 'col-lg-4',
+            1 => 'col-md-4',
+            2 => 'col-12',
+          ],
+      ],
+      'blocks' => [
+        [
+          'region' => 'blb_region_col_1',
+          'title' => 'Block 24',
+          'body' => '33%',
+        ],
+        [
+          'region' => 'blb_region_col_2',
+          'title' => 'Block 25',
+          'body' => '33%',
+        ],
+        [
+          'region' => 'blb_region_col_3',
+          'title' => 'Block 26',
+          'body' => '33%',
+        ],
+      ],
+    ],
+  ];
+
+  $frontpage_node = Node::create(
+    [
+      'type' => 'flexible_landing_page',
+      'title' => 'Open Y',
+      'langcode' => 'en',
+      'uid' => '1',
+      'status' => 1,
+    ]
+  );
+  $sections = [];
+  foreach ($sections_data as $section_data) {
+    $section = new Section('bootstrap_layout_builder:' . $section_data['layout'], [
+      'breakpoints' =>  $section_data['breakpoints'],
+      'container' => $section_data['container'],
+      'container_wrapper' => [
+        'bootstrap_styles' => [
+          'background' => [
+            'background_type' => 'color',
+          ],
+          'background_color' => [
+            'class' => $section_data['container_wrapper_background_color'],
+          ],
+          'margin' => [
+            'class' => 'bs-my-2',
+          ],
+        ],
+      ],
+      'layout_regions_classes' => $section_data['layout_regions_classes'],
+    ]);
+    foreach ($section_data['blocks'] as $block) {
+      $content_block = BlockContent::create([
+        'type' => 'basic_block',
+      ]);
+      $content_block->set('field_block_content', [
+        'value' => $block['body'],
+        'format' => 'full_html',
+      ]);
+      $content_block->save();
+
+      $section->appendComponent(new SectionComponent(
+        \Drupal::service('uuid')->generate(),
+        $block['region'],
+        [
+          'id' => 'inline_block:basic_block',
+          'label' => $block['title'],
+          'label_display' => 'visible',
+          'block_revision_id' => $content_block->getRevisionId(),
+        ]
+      ));
+    }
+    $sections[] = $section;
+  }
+  $frontpage_node->set(OverridesSectionStorage::FIELD_NAME, $sections);
+  $frontpage_node->save();
+
+  // Set homepage by node id but checking it first by title only.
+  $config_factory = Drupal::configFactory();
+  $config_factory->getEditable('system.site')->set('page.front', '/node/' . $frontpage_node->id())->save();
+}

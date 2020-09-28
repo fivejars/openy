@@ -26,6 +26,5 @@ function openy_bouquet_form_system_theme_settings_alter(&$form, \Drupal\Core\For
  */
 function openy_bouquet_preprocess_page(&$variables) {
   $variables['association_name'] = theme_get_setting('association_name');
-  $name_position = theme_get_setting('name_position') == 'left' ? 'mr' : 'ml';
-  $variables['name_position'] = $name_position . '-auto';
+  $variables['name_position'] = theme_get_setting('name_position') === 'right' ? 'text-right' : '';
 }
