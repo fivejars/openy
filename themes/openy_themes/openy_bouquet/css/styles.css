@@ -40,3 +40,8 @@
 #openy_alerts_app_header {
   display: none;
 }
+
+#drupal-off-canvas .fieldgroup.field-background-color .form-radios label{
+  color: transparent;
+  overflow: hidden;
+}
