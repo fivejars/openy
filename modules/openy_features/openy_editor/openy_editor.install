@@ -44,3 +44,12 @@ function openy_editor_update_8003() {
   \Drupal::service('module_installer')->install(['ckeditor_font'], TRUE);
   openy_editor_update_8002();
 }
+
+/**
+ * Update editor settings to add white text color.
+ */
+function openy_editor_update_8004() {
+  $config = drupal_get_path('module', 'openy_editor') . '/config/install/editor.editor.full_html.yml';
+  $config_importer = \Drupal::service('openy_upgrade_tool.param_updater');
+  $config_importer->update($config, 'editor.editor.full_html', 'settings.plugins.colorbutton.colors');
+}
