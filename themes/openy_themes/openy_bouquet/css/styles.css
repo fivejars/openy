@@ -37,6 +37,10 @@
   overflow-x: hidden;
 }
 
+.layout-builder-block {
+  background-color: inherit;
+}
+
 #openy_alerts_app_header {
   display: none;
 }
