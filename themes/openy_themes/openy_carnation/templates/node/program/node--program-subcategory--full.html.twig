@@ -102,28 +102,12 @@
   </div>
 {% endif %}
 
-{# Filters #}
-{% set hasSidebar = content.field_sidebar_content and content.field_sidebar_content|render|striptags|trim %}
-
-<div class="container">
-  <div class="row">
-
    {# Category content #}
-    <div class="main-region col">
-      {{ content.field_category_description }}
-      {{ content.field_content }}
-    </div>
-
-    {# Category sidebar #}
-    {% if hasSidebar %}
-    <div class="sidebar-region col-md-5 col-lg-4">
-      <article class="program-sidebar program-sidebar-sub-category">
-        {{ content.field_sidebar_content }}
-      </article>
-    </div>
-    {% endif %}
-
+<div class="main-region">
+  <div class="container">
+    {{ content.field_category_description }}
   </div>
+  {{ content.field_content }}
 </div>
 
 {{ content.field_bottom_content }}
