@@ -611,3 +611,13 @@ function openy_carnation_entity_file_uri_by_fid($fid_array) {
 
   return '';
 }
+
+/**
+ * Implements hook_preprocess_table().
+ *
+ * Add class for tables, that wasn't inserted through wysiwig, for preventing
+ * applying Carnation table styles.
+ */
+function openy_carnation_preprocess_table(array &$variables) {
+  $variables['attributes']['class'] = 'default-table';
+}
