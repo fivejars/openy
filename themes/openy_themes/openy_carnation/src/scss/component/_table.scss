@@ -1,0 +1,55 @@
+/**
+ * Tables styling.
+ */
+
+table:not(.default-table) {
+  border-color: transparent;
+  width: 100% !important;
+  border-radius: 5px;
+  overflow-x: scroll;
+  display: block;
+  background: white;
+
+  @include media-breakpoint-up(sm) {
+    display: table;
+  }
+
+  td, th {
+    min-width: 160px;
+    border: 0;
+  }
+
+  th {
+    @include cachet();
+    background-color: $teal;
+    color: $white;
+    font-size: 18px;
+  }
+
+  tr {
+    line-height: 3;
+
+    // Add border-radius.
+    &:first-child > * {
+      &:first-child {
+        border-top-left-radius: 5px;
+      }
+      &:last-child {
+        border-top-right-radius: 5px;
+      }
+    }
+    &:last-child > * {
+      &:first-child {
+        border-bottom-left-radius: 5px;
+      }
+      &:last-child {
+        border-bottom-right-radius: 5px;
+      }
+    }
+    // End adding border-radius
+
+    &:nth-child(even) {
+      background-color: rgba($gray-400, .11);
+    }
+  }
+}
